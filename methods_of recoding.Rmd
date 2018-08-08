@@ -1,0 +1,160 @@
+---
+title: "Classical perspectives of controling acquiescence"
+description: |
+  Explores properties of two methods (centering and standardizing) of recoding scores to control for acquiescence bias.
+author:
+  - name: Ricardo Primi 
+    url: https://www.labape.com.br
+    affiliation: USF
+    affiliation_url: https://www.usf.edu.br
+date: "`r Sys.Date()`"
+output: radix::radix_article
+---
+
+```{r include=FALSE}
+
+library(radix)
+
+```
+
+  
+#### Ten berge partialling the mean (centering method) 
+
+Consider a six-item scale composed by three pairs of antonym itmes scored ina 5-point likert scale. Let $i = 1, 2, 3$ be items phrased on the positive pole, and $i = a,b,c$ be the negative ones and $x_{ij}$ be the original response of subject $j$ on item $i$. The aquiescence index $acq_j$ of a subject $j$ is given by:  
+  
+  
+$$acq_j =\frac{1}{6} \left[\sum_{i=1}^{3}x_{ij} + \sum_{i=a}^{c}x_{ij} \right ]$$  
+  
+  
+The total score $scr_j$ on the scale is given by:  
+
+$$scr_j = \frac{1}{6} \left[\sum_{i=1}^{3}x_{ij} + \sum_{i=a}^{c} \left( 6-x_{jj} \right) \right]$$
+  
+  
+And the recoded score  
+$$scr.rec_{j}=\frac{1}{6} \left[  \sum_{i=1}^{3} \left( x_{ij}- acq_j \right) -1 \left(  \sum_{i=a}^{c} \left( x_{ij}-acq_j \right) ~ \right)  \right]$$  
+  
+  
+$$scr.rec_{j}=\frac{1}{6} \left[  \sum_{i=1}^{3}x_{ij} - \sum _{i=1}^{3}acq_j - \sum _{i=a}^{c}x_{ij} + \sum _{i=1}^{3}acq_j \right]$$  
+  
+  
+That simplifies to:  
+  
+$$scr.rec_{j}=\frac{1}{6} \left[  \sum _{i=1}^{3}x_{ij}- \sum _{i=a}^{c}x_{ij} \right]$$
+
+It is interesting to note that for balanced scales the original scores is a linear transformation of original scores, that is, the classical scores is automatic recoded:
+
+$$\frac{1}{6} \left[\sum_{i=1}^{3}x_{ij} + \sum_{i=a}^{c} \left( 6-x_{ij} \right) \right]$$  
+$$\frac{1}{6} \left[  \sum _{i=1}^{3}x_{ij}- \sum _{i=a}^{c}x_{ij} \right]$$  
+
+$$\frac{1}{6} \sum_{i=1}^{3}x_{ij} + \frac{1}{6} \sum_{i=a}^{c} \left(6-x_{ij} \right)$$  
+$$\frac{1}{6}\sum_{i=1}^{3}x_{ij} - \frac{1}{6}\sum_{i=a}^{c}x_{ij}$$  
+
+$$\frac{1}{6} \sum_{i=1}^{3}x_{ij} + \frac{1}{6} \sum_{i=a}^{c}x_{ij} + 3$$
+
+$$\frac{1}{6}\sum _{i=1}^{3}x_{ij} - \frac{1}{6}\sum_{i=a}^{c}x_{ij}$$  
+
+$$scr_j =  scr.rec_{j} + 3$$  
+
+#### Simulating balanced scale of 6 items (3 positively keyed and 3 negatively keyed)  
+
+
+* Produces a dataset 6 items of 5 point likers scale.  
+* Create all$5^6=15625$ possible response patterns  
+
+```{r echo=TRUE}
+  
+  library(crossdes)
+  library(tidyverse)
+
+  r_ptrn <- permutations(5, 6, repeats.allowed=TRUE)
+  colnames(r_ptrn) <- paste("i", 1:6, sep="")
+
+```
+ 
+* Create mean and standard deviation within subjects and recode responses using two methods: (a) centering $c_{ij} = x_{ij}-acq_j$ and (b) $z_{ij} = (x_{ij}-acq_j)/sd_j$  
+
+```{r echo=TRUE}
+ 
+  acq_j <- apply(r_ptrn, 1, mean)
+  sd_j <- apply(r_ptrn, 1, sd)
+  
+  r_ptrn_c <- apply(r_ptrn, 2, function(x) { x - acq_j} )
+  r_ptrn_z <- apply(r_ptrn, 2, function(x) { (x - acq_j)/sd_j} )
+  
+
+```
+
+* Calculate scores. Note we reverse three last items as if they were negatively worded items.
+
+```{r echo=TRUE}
+
+  scr_j  <- r_ptrn %>% 
+    as.data.frame %>%
+    mutate_at(4:6,  funs(6-.)) %>%
+    apply(1, mean, na.rm=TRUE)
+  
+  scr.rec_j  <- r_ptrn_c %>% 
+    as.data.frame %>%
+    mutate_at(4:6,  funs(-1*.)) %>%
+    apply(1, mean, na.rm=TRUE)
+  
+  scr.z.rec_j  <- r_ptrn_z %>% 
+    as.data.frame %>%
+    mutate_at(4:6,  funs(-1*.)) %>%
+    apply(1, mean, na.rm=TRUE)
+
+```
+
+* Create a tibble with scores acquiescence index
+
+```{r echo=TRUE}
+
+ df <- tibble(
+   scr_j,
+   scr.rec_j,
+   scr.z.rec_j,
+   acq_j,
+   sd_j
+  )
+
+```
+
+#### Visualizing relationship among scores and acquiescence parameters
+
+* How recoded scores (standardized and centered) are related to original scores
+* How sd_j infuences transformation
+* What is the relaioship between acq_j (mean) and standard deviation sd_j 
+
+```{r, echo=TRUE}
+  
+  library(artyfarty)
+  library(psych)
+  library(knitr)
+   
+  df %>%
+    ggplot(aes(y=scr_j, x=scr_j , colour=acq_j)) + 
+    geom_point(alpha = .6) +  
+    theme_farty()   +
+    scale_colour_gradientn(colours = pal("ashes"))
+   
+  df %>%
+    ggplot(aes(y=scr.z.rec_j, x=scr_j , colour=sd_j)) + 
+    geom_point(alpha = .6) +  
+    theme_farty()   +
+    scale_colour_gradientn(colours = pal("ashes"))
+ 
+   df %>%
+    ggplot(aes(y=sd_j, x=acq_j, colour=acq_j)) + 
+    geom_point(alpha = .6) +  
+    theme_farty()   +
+    scale_colour_gradientn(colours = pal("ashes"))
+
+  df %>%
+    describe %>%
+    kable(digits = 2)
+ 
+
+```
+
+
