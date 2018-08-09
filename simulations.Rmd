@@ -1,0 +1,286 @@
+---
+title:  "Simulations discussed used in Acquiescence and Person Differential Functioning: Solving Person DIF with Balanced Scales"
+author: "Ricardo Primi"
+date: "20/07/2018"
+output: html_document
+theme: paper
+
+
+---
+```{r setup, include=FALSE}
+  knitr::opts_chunk$set(echo = TRUE, warnings = FALSE, message = FALSE)
+```
+
+#### Libraries
+```{r}
+  
+  library(tidyverse)
+  
+  library(sjPlot)
+  library(artyfarty)
+ 
+  library(mirt)
+  library(psych)
+  library(knitr)
+  library(lavaan)
+
+  library(xlsx)
+
+ 
+```
+
+#### Loads empirical data
+
+```{r}
+ 
+  bd_bjmsp <-  readRDS("bd_bjmsp.rds")
+  item_dic_c <-  readRDS("item_dic_c.rds")
+  
+ 
+```
+#### Load R functions 
+
+This file contains all functions used in the paper:  
+  
+* `sim_trait_acq` that simulates two factors trait and acquiescence. It has the following arguments:  
+    + N=10000, number of subjects
+    + mean_a1, mean of the discrimination distribution
+    + sd_a1, standard deviation of the discrimination distribution
+    + sd_acq,  ariance of the acquiescence factor
+    + n_pw,  number of positively worded items
+    + n_nw,  number of negatively worded items
+    + interc_pw, matrix with positively worded items itntercepts to draw from
+    + interc_nw   matrix with negatively worded items itntercepts to draw from  
+    
+* `classical_scores` that calculates acquiescence and recoded scores  
+* `pdif_scores` that calculates pddif using graded  response model  
+* `ri_scores` that calculates multidimensional graded response model with random intercept  
+
+```{r}
+
+ source("simul_functions.R")
+
+```
+
+#### Calculate basic parameters in empirical data
+
+```{r}
+ 
+# recover parameters
+  pars3 <- bd_bjmsp %>% 
+    select(item_dic_c$item_labels) %>%
+    mutate_if(item_dic_c$pole==0, funs(6-.)) %>%
+    mirt(2, itemtype = 'graded', pars = 'values',TOL = .001)
+
+# fix loadins 1 and -1 of random intercept factors F2, fix est=F and estimates variance of F2
+  pars3[pars3$name=="a2", ]$value <- item_dic_c$a2 
+  pars3[pars3$name=="a2", ]$est <- FALSE 
+  pars3[pars3$name=="a1", ]$value <- abs(pars3[pars3$name=="a1", ]$value)
+  pars3[pars3$name=="COV_22", ]$est <- TRUE 
+
+# calibrate item parameters
+  ri <- bd_bjmsp %>% 
+    select(item_dic_c$item_labels) %>%
+    mutate_if(item_dic_c$pole==0, funs(6-.)) %>%
+    mirt(2, pars = pars3,itemtype = 'graded', TOL = .001)
+
+# examines results
+  summary(ri)
+  coef(ri , simplify=TRUE, irt.parms = TRUE)
+  
+  coef(ri , simplify=TRUE)$items %>% 
+    as.data.frame() %>%
+    describe
+
+  coef(ri , simplify=TRUE)$items %>% 
+     as.data.frame() %>%
+     describeBy( group = .$a2)
+  
+```
+
+
+#### Simulate datasets
+
+* 10.000 examinees 
+* 12 items scale, 5-likert options
+* 3 conditions: Balanced (6 vs 6), Unbalanced Positive (8 vs 4), Unbalanced negative (4 vs 8)
+* 50 replications per condition
+
+
+```{r eval=FALSE}
+
+# colect basic parametrs from real data  
+
+  mean_a1 = mean(coef(ri , simplify=TRUE)$items[, "a1"])
+  
+  sd_a1 = sd(coef(ri , simplify=TRUE)$items[, "a1"]) 
+  
+  interc_pw  <-  coef(ri, simplify=TRUE)$items %>% as.data.frame() %>%
+          arrange(a2) %>% filter(a2==1) %>% select(3:6)
+  
+  interc_nw  <-  coef(ri, simplify=TRUE)$items %>% as.data.frame() %>%
+          arrange(a2) %>% filter(a2==-1) %>% select(3:6)
+
+# variable simulation parameters
+# number of replications
+r <- 50  
+prms <- 
+  tibble(
+    n_pw = c(rep(6, r), rep(9, r), rep(3, r)),
+    n_nw = c(rep(6, r), rep(3, r), rep(9, r))
+  )
+
+# loop to simulate using purrr (cool !!)
+ 
+ dt_simul <- prms %>% pmap(
+    sim_trait_acq, 
+    N=10000,
+    mean_a1 = mean_a1,
+    sd_a1 = sd_a1, 
+    sd_acq = sqrt(.40),
+    interc_pw = interc_pw,   
+    interc_nw = interc_nw  
+   )
+
+
+ 
+```
+
+####  Calculate Acquiescece and Trait from 3 methods: classical, IRT-PDIF and random-intercept
+
+```{r eval=FALSE}
+
+  classical <- map(dt_simul, classical_scores, lik=3)
+  pdif <- map(dt_simul, pdif_scores)
+  ri_sim <- map(dt_simul, ri_scores)
+  ri_sim2 <- map(dt_simul, ri_scores, a="a3")
+  
+  coef(ri_sim2[[51]][[2]], simplify = TRUE)
+  coef(ri_sim2[[101]][[2]], simplify = TRUE)
+  
+  summary(pdif)
+  coef(ri_sim2[[101]][[2]], simplify = TRUE)
+
+```
+
+#### Extract scores and run correlations
+```{r eval=FALSE}
+
+# extract data
+     pdif_scores <- map(pdif, "scrs")
+     ri_scores <- map(ri_sim, "scrs")
+     ri_scores2 <- map(ri_sim2, "scrs")
+     ri_scores2 <- map(ri_scores2, as.data.frame)
+     
+     nm <- paste(dimnames(ri_scores2[[2]])[[2]], "b", sep = "")
+     ri_scores2 <- lapply(ri_scores2, function(x) setNames(x, nm))
+
+     true_scores <- map(dt_simul, "persons")
+    
+     scores <- map2(classical, pdif_scores, cbind)
+     scores  <- map2(scores, ri_scores, cbind)
+     scores <- map2(scores, ri_scores2, cbind)
+     scores <- map2(scores, true_scores, cbind)
+   
+  # calculate correlations
+    correlations <- map(scores, cor)
+ 
+ 
+  # model fit
+     fits <- ri_sim %>% map("mirt_obj") %>% map(M2)
+     fits0 <- pdif %>% map("mirt_obj") %>% map(M2)
+     
+     
+  # descriptives
+  
+  descr <- map(scores, describe) %>% 
+    map(as.data.frame) %>%
+    map(~mutate(.x, vars2=rownames(.x))) %>%
+    map(~gather(.x, key = stats, value = value, -vars, -vars2)) %>%
+    enframe() %>% 
+    unnest() %>%
+    mutate(repl = 
+    case_when(
+          name <=50 ~1,
+          name >50 &  name <=100 ~2,
+          name >100 ~3)
+      ) %>%
+    filter(vars2 %in% 
+        c("scr", "scr_rec", "acq", 
+        "pdif_mirt", "F1", "F2", "F1b", 
+        "F2b","f1_1d", "trait_t", "acq_t")
+      ) %>%
+    filter(stats %in% c("mean", "sd")) %>%
+    select(vars2, stats, value, repl) %>%
+    group_by(vars2, stats, repl) %>%
+    summarise_all(.funs = mean) %>%
+    spread(key = stats, value = value) %>%
+    arrange(repl)
+
+   
+   fit0_descr <- fits0 %>%  enframe() %>% 
+    unnest() %>% summarise_all(.funs = mean)
+ 
+  fits_descr <- fits %>% enframe() %>% 
+    unnest() %>% summarise_all(.funs = mean) 
+   
+   
+  save(scores, correlations, 
+    fits, fits0, descr, 
+    fit0_descr, fits_descr, 
+    file = "simul_results2.RData")
+ 
+ 
+```
+
+##### Calculate average of the 50 simulations
+
+```{r eval=FALSE}
+
+# calculate average correlations among matrices 
+# https://stackoverflow.com/questions/19218475/element-wise-mean-over-list-of-matrices
+
+
+
+    #  Make a 3D array from list of matrices
+    
+    arr1 <- array( unlist(correlations[1:50]) , c(22,22,50))
+    arr2 <- array( unlist(correlations[51:100]) , c(22,22,50))
+    arr3 <- array( unlist(correlations[101:150]) , c(22,22,50))
+    
+    correlations[[1]] - correlations[[6]]
+    
+    arr1[, , 2]
+ 
+    #  Get mean and sd of third dimension
+    tb1m <- apply( arr1 , 1:2 , mean )
+    tb2m <- apply( arr2 , 1:2 , mean )
+    tb3m <- apply( arr3 , 1:2 , mean )
+    
+    tb1sd <- apply( arr1 , 1:2 , sd )
+    tb2sd <- apply( arr2 , 1:2 , sd )
+    tb3sd <- apply( arr3 , 1:2 , sd )
+    
+  
+    dimnames(tb1m) <- dimnames(correlations[[1]])
+    dimnames(tb2m) <- dimnames(correlations[[1]])
+    dimnames(tb3m) <- dimnames(correlations[[1]])
+    
+    dimnames(tb1sd) <- dimnames(correlations[[1]])
+    dimnames(tb2sd) <- dimnames(correlations[[1]])
+    dimnames(tb3sd) <- dimnames(correlations[[1]])
+  
+  rm(arr1, arr2, arr3, r)
+  
+  write.xlsx(tb1m, file = "tables2new.xlsx", sheetName = "tb1m", showNA = FALSE, append = TRUE)
+  write.xlsx(tb2m, file = "tables2new.xlsx", sheetName = "tb2m", showNA = FALSE, append = TRUE)
+  write.xlsx(tb3m, file = "tables2new.xlsx", sheetName = "tb3m", showNA = FALSE, append = TRUE)
+  
+  write.xlsx(tb1sd, file = "tables2new.xlsx", sheetName = "tb1sd", showNA = FALSE, append = TRUE)
+  write.xlsx(tb2sd, file = "tables2new.xlsx", sheetName = "tb2sd", showNA = FALSE, append = TRUE)
+  write.xlsx(tb3sd, file = "tables2new.xlsx", sheetName = "tb3sd", showNA = FALSE, append = TRUE)
+  
+    
+  write.xlsx(as.data.frame(descr), file = "tables3new.xlsx", sheetName = "stat") 
+
+```
