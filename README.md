@@ -3,8 +3,7 @@ Code, data and additional materials of the paper Acquiescence and Person Differe
 
 
 * Two methods of acquiescence recoding
-https://rawgit.com/rprimi/acqu_mirt/blob/master/methods_of_recoding.html
-
+http://www.labape.com.br/acqu_mirt/methods_of_recoding.html
 
 
 
