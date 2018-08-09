@@ -8,4 +8,9 @@ http://www.labape.com.br/acqu_mirt/simulations.html
 * Two methods of acquiescence recoding  
 http://www.labape.com.br/acqu_mirt/methods_of_recoding.html  
 
+    
+    
+    
+Acquiescence bias in balanced scales correction functions similar to noise canceling headphones
 
+![](noise_canceling.png)
