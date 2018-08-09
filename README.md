@@ -3,7 +3,7 @@
 Code, data and additional materials of the paper Acquiescence and Person Differential Functioning: Solving Person DIF with Balanced Scales  
   
 * Simulation developed in the paper
-http://www.labape.com.br/acqu_mirt/simulations.html  
+http://www.labape.com.br/acqu_mirt/simulation.html  
   
 * Two methods of acquiescence recoding  
 http://www.labape.com.br/acqu_mirt/methods_of_recoding.html  
