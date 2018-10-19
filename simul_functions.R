@@ -231,7 +231,7 @@ pdif_scores <- function(obj) {
 ############## RI scores
 
 
-ri_scores <- function(obj, a = "a2", cov_ta = TRUE) {
+ri_scores <- function(obj, a = "a2", cov_ta = FALSE) {
     
     # recover df with parameters
     prms  <-obj$data %>%
