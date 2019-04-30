@@ -76,7 +76,7 @@ This file contains all functions used in the paper:
   pars3[pars3$name=="a2", ]$value <- item_dic_c$a2 
   pars3[pars3$name=="a2", ]$est <- FALSE 
   pars3[pars3$name=="a1", ]$value <- abs(pars3[pars3$name=="a1", ]$value)
-  pars3[pars3$name=="COV_22", ]$est <- FALSE 
+  pars3[pars3$name=="COV_22", ]$est <- FALSE  
 
 # calibrate item parameters
   ri <- bd_bjmsp %>% 

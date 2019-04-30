@@ -1,63 +1,82 @@
 ---
-title: "Classical perspectives of controling acquiescence"
+title: "Classical psychometric methods of acquiescence control with balanced scales."
 description: |
-  Explores properties of two methods (centering and standardizing) of recoding scores to control for acquiescence bias.
+  This paper explores psychometric properties of the classical method for measuring and controling for acquiescence bias with scales that uses true-keyed items versus false keyed items.
+
 author:
   - name: Ricardo Primi 
-    url: https://www.labape.com.br
-    affiliation: USF
-    affiliation_url: https://www.usf.edu.br
-date: "`r Sys.Date()`"
-output: radix::radix_article
----
+    url: http://lattes.cnpq.br/511415207991190
+    affiliation: Universidade São Francisco
+    affiliation_url: http://www.usf.edu.br/ppg/
+  - name: Daniel D. Santos 
+    url:  http://lattes.cnpq.br/1023570038147506
+    affiliation: Universidade de São Paulo (USP-RP)
+    affiliation_url: http://lepes.fearp.usp.br
 
+bibliography: biblio.bib  
+output: radix::radix_article  
+
+
+---
 
 ```{r include=FALSE}
 
 library(radix)
 
 ```
+#### What is acquiescence
+Acquiescence refers to the tendency to agree with questions regardless of the content of the item. One way to examine acquiescence is to include positively-keyed (PK) and negatively-keyed items (NK), that is, markers of opposite poles of a trait. Imagine an item designed to measure negative emotional regulation, such as i+: ‘I adapt easily to new situations without worrying too much’, with students asked to respond on a scale with ‘1’ (not at all like me), ‘2’ (little like me), ‘3’ (moderately like me), ‘4’ (a lot like me) and ‘5’ (completely like me). Also, an antonym pair item is included such as i-: ‘I have trouble controlling my anxiety in difficult situations’. A person very high in acquiescence will tend to respond with ‘4’ or ‘5’ to both items. A person with low acquiescence, that is, one that responds more to the item’s psychological meaning and who is higher on emotional regulation will tend to give reflected responses, for example ‘4’ to i+ and ‘2’ to i-.  
+  
+#### Basic psychometric properties of classical scores of balanced scales
+Consider a six-item scale composed by three pairs of antonym items scored ina 5-point likert scale. Let $i = 1, 2, 3$ be items phrased on the positive pole (PK), and $i = a,b,c$ be the negative ones (NK) and $x_{ij}$ be the original response of subject $j$ on item $i$. The aquiescence index $acq_j$ of a subject $j$ is given by:  
 
-  
-#### Ten berge partialling the mean (centering method) 
-
-Consider a six-item scale composed by three pairs of antonym items scored ina 5-point likert scale. Let $i = 1, 2, 3$ be items phrased on the positive pole, and $i = a,b,c$ be the negative ones and $x_{ij}$ be the original response of subject $j$ on item $i$. The aquiescence index $acq_j$ of a subject $j$ is given by:  
-  
-  
 $$acq_j =\frac{1}{6} \left[\sum_{i=1}^{3}x_{ij} + \sum_{i=a}^{c}x_{ij} \right ]$$  
-  
-  
-The total score $scr_j$ on the scale is given by:  
+Since these items measure the same trait but come from opposite ends of the trait continuum, agreement with positive items should co-occur with disagreement with negative items. Therefore, the expected score on this index will be $acq_j=3$. If $acq_j>3$ or  $acq_j<3$ it will indicate inconsistent respponding of high acquiescence or disacquiescence respectively.
 
-$$scr_j = \frac{1}{6} \left[\sum_{i=1}^{3}x_{ij} + \sum_{i=a}^{c} \left( 6-x_{jj} \right) \right]$$
-  
-  
-And the recoded score  
-$$scr.rec_{j}=\frac{1}{6} \left[  \sum_{i=1}^{3} \left( x_{ij}- acq_j \right) -1 \left(  \sum_{i=a}^{c} \left( x_{ij}-acq_j \right) ~ \right)  \right]$$  
-  
-  
-$$scr.rec_{j}=\frac{1}{6} \left[  \sum_{i=1}^{3}x_{ij} - \sum _{i=1}^{3}acq_j - \sum _{i=a}^{c}x_{ij} + \sum _{i=1}^{3}acq_j \right]$$  
-  
-  
-That simplifies to:  
-  
-$$scr.rec_{j}=\frac{1}{6} \left[  \sum _{i=1}^{3}x_{ij}- \sum _{i=a}^{c}x_{ij} \right]$$
+Back in 1999 Ten Berge [@TenBerge1999] examined properties of ipsative transformation of balanced personality scales containing NK and PK items. He noted that balanced scales is a special case with peculiar properties. He describes one method called partialing the mean. The idea is to subtract $acq_j$, the subject mean, from each item score $x_{ij}$ producing a transformed score $x'_{ij} =  x_{ij}- acq_j$ 
+If we sum these transformed scores $x'_{ij}$ they will sum to zero for each individual:  
 
-It is interesting to note that for balanced scales the original scores is a linear transformation of original scores, that is, the classical scores is automatic recoded.  
+$$
+ \sum_{i=1}^{3} \left( x_{ij}- acq_j \right) + \sum_{i=a}^{c} \left( x_{ij}-acq_j \right) = 0,
+$$
+that is, it will be ipsative. Chan & Bentler (1998)[@ChanCovariancestructureanalysis1998]) explains: "Let $x = \left( x_{1} ... x_p \right)$ be a p x 1 column vectors such that $\sum_{i=1}^{p}x_{i}=l'x=c$ where $l$ is a p x 1 unit vector ans $c$ is constant scalar. So $x$ is a p-dimensional data vector with ipsative property" (p.215). This could look like we have removed all between-subject variance and are left with only within-subject variance. But when calculating subject’s scores we reverse half$x'_{ij}$ item scores of NK items and then calculates average item scores:  
 
-The score culd be written in this form:  
-$$scr_{j}= \frac{1}{6} \left[\sum_{i=1}^{3}x_{ij} + \sum_{i=a}^{c} \left( 6-x_{ij} \right) \right] = 
-\frac{1}{6} \sum_{i=1}^{3}x_{ij} + \frac{1}{6} \sum_{i=a}^{c} \left(6-x_{ij} \right) =
-\frac{1}{6} \left[  \sum _{i=1}^{3}x_{ij}- \sum _{i=a}^{c}x_{ij} \right] + 3$$ 
+$$
+\begin{align*}
+scr.rec_{j} &=\frac{1}{6} \left[  \sum_{i=1}^{3} \left( x_{ij}- acq_j \right) -1 \left(  \sum_{i=a}^{c} \left( x_{ij}-acq_j \right)  \right)  \right] \\
+scr.rec_{j}&=\frac{1}{6} \left[  \sum_{i=1}^{3}x_{ij} - \sum _{i=1}^{3}acq_j - \sum _{i=a}^{c}x_{ij} + \sum _{i=1}^{3}acq_j \right] \\
+scr.rec_{j}&=\frac{1}{6} \left[  \sum _{i=1}^{3}x_{ij}- \sum _{i=a}^{c}x_{ij} \right] \\
+scr.rec_{j}&=\frac{1}{2} \left[ \frac{ \sum_{i=1}^{3}x_{ij}}{3} - 
+\frac{ \sum _{i=a}^{c}x_{ij}}{3} \right] 
+\end{align*}
+$$
+This final total score doesn’t sum to a constant across individuals. There will be still between-subject variance left. But this variance is purged from acquiescence (the variance relateds to $acq_j$).  
+
+One important property of balanced scales is that the classical scores $scr_j$ is equivalent to acquiescence-controlled scores $scr.rec_{j}$. It is just a linear transfomration of $scr.rec_{j}$. That is:  
+
+$$
+\begin{align*}
+scr_j &= \frac{1}{6} \left[\sum_{i=1}^{3}x_{ij} + \sum_{i=a}^{c} \left( 6-x_{jj} \right) \right] \\
+scr_j &= \frac{1}{6}\sum_{i=1}^{3}x_{ij} + \frac{1}{6}\sum_{i=a}^{c} 6 - \frac{1}{6} \sum_{i=a}^{c}x_{jj} \\
+scr_j &=\frac{1}{6}\sum_{i=1}^{3}x_{ij} + \frac{18}{6 }- \frac{1}{6} \sum_{i=a}^{c}x_{jj} \\
+scr_j &= \frac{1}{6}\sum_{i=1}^{3}x_{ij} - \frac{1}{6} \sum_{i=a}^{c}x_{ij}  + 3 \\
+scr_j &= \frac{1}{6} \left( \sum_{i=1}^{3}x_{ij} - \sum_{i=a}^{c}x_{jj} \right)  + 3  \\
+scr_j &= \frac{1}{2} \left[ \frac{\sum_{i=1}^{3}x_{ij}}{3} - \frac{ \sum _{i=a}^{c}x_{ij}}{3} \right] + 3 \\
+scr_j &= scr.rec_{j} + 3. 
+\end{align*}
+$$
+
+#### Understanding acquiescence from an analogy with noise canceling headphones  
+
+The way noise-canceling headphones work, provides a good analogy of what is going on using this correction. These headphones have a microphone inside their cups to “hear” external noises and neutralize their distorting effects. These headsets’ electronics create a new inverted version of the noise sound wave (180 degrees out of phase) that is send into a speaker. In the speaker, you hear now signal, noise and inverted noise waves. Since there are two noise waves, one positive and one negative, they cancel each other out and a clearer signal remains. This is analogous to what happens with balanced personality scales: Trait is signal, bias is noise. The only difference is that signal, not noise, is inverted - via positive and negative items – and inserted in the scale. Noise, that is, acquiescence is a positive signal that happens to occur on both positive and negative items. When scoring the test, negative items are reversed, and item scores are summed into a scale score. While doing this, negative items are inverted aligning them to the positive pole, transforming the signal in the same “phase” as positive items, finally ending up with equal amounts of positive and negative noise that cancel each other out. In synthesis, if we carefully develop balanced items to isolate bias in the positive manifold, the remaining variance after ipsatizing will be a purified measure. This formula $scr.rec_{j}=\frac{1}{6} \left[  \sum _{i=1}^{3}x_{ij}- \sum _{i=a}^{c}x_{ij} \right]$ makes the analogy with noise canceling headphones more salient. In headphones you have audio signal (+ noise) plus (- reflected noise) therefore, noise cancel out. In balanced scales: a) positive items are composed of +trait signal plus (+acquiescence bias) and b) negative items are composed of: - trait signal plus (+acquiescence bias). When we compute [+trait signal + (+acquiescence bias)] minus [-trait signal + (+acquiescence bias)] we end up only with trait signal and acquiescence cancels out  
 
 
-That makes explicit that the first component $\frac{1}{6} \left[  \sum _{i=1}^{3}x_{ij}- \sum _{i=a}^{c}x_{ij} \right]$ is equal to $scr.rec_{j}$. Therefore:
+![](noise_canceling.png)
+  
 
-$$scr_j =  scr.rec_{j} + 3$$  
 
 
 #### Simulating balanced scale of 6 items (3 positively keyed and 3 negatively keyed)  
-
 
 * Produces a dataset 6 items of 5 point likers scale.  
 * Create all$5^6=15625$ possible response patterns  
@@ -138,49 +157,52 @@ $$scr_j =  scr.rec_{j} + 3$$
   library(artyfarty)
   library(psych)
   library(knitr)
+  library(ggplot2)
+  library(RColorBrewer)  
    
   df %>%
     ggplot(aes(y=scr.rec_j, x=scr_j , colour=acq_j)) + 
     geom_point(alpha = .6) +  
-    theme_farty()   +
-    scale_colour_gradientn(colours = pal("ashes"))
+     theme_farty() +
+    scale_colour_gradientn(colours = brewer.pal(7, "Paired")) 
+ 
    
   df %>%
     ggplot(aes(y=scr.z.rec_j, x=scr_j , colour=sd_j)) + 
     geom_point(alpha = .6) +  
-    theme_farty()   +
-    scale_colour_gradientn(colours = pal("ashes"))
+      theme_farty() +
+    scale_colour_gradientn(colours = brewer.pal(7, "Paired")) 
    
   df %>%
     ggplot(aes(y=scr.z.rec_j, x=scr_j , colour=acq_j)) + 
     geom_point(alpha = .6) +  
-    theme_farty()   +
-    scale_colour_gradientn(colours = pal("ashes"))
+       theme_farty() +
+    scale_colour_gradientn(colours = brewer.pal(7, "Paired")) 
  
    df %>%
     ggplot(aes(y=sd_j, x=acq_j, colour=scr_j)) + 
     geom_point(alpha = .6) +  
-    theme_farty()   +
-    scale_colour_gradientn(colours = pal("ashes"))
+     theme_farty() +
+    scale_colour_gradientn(colours = brewer.pal(7, "Paired")) 
    
    
   df %>%
     ggplot(aes(y=scr.rec_j, x=sd_j, colour=acq_j)) + 
     geom_point(alpha = .6) +  
-    theme_farty()   +
-    scale_colour_gradientn(colours = pal("ashes"))
+      theme_farty() +
+    scale_colour_gradientn(colours = brewer.pal(7, "Paired")) 
   
   df %>%
     ggplot(aes(y=scr.z.rec_j, x=sd_j, colour=acq_j)) + 
     geom_point(alpha = .6) +  
-    theme_farty()   +
-    scale_colour_gradientn(colours = pal("ashes"))
+    theme_farty() +
+    scale_colour_gradientn(colours = brewer.pal(7, "Paired")) 
   
   df %>%
     ggplot(aes(y=scr.rec_j, x=acq_j, colour=sd_j)) + 
     geom_point(alpha = .6) +  
-    theme_farty()   +
-    scale_colour_gradientn(colours = pal("ashes"))
+     theme_farty() +
+    scale_colour_gradientn(colours = brewer.pal(7, "Paired")) 
 
   df %>%
     describe %>%
